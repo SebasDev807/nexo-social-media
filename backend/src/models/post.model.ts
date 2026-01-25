@@ -6,7 +6,7 @@ const PostSchema = new Schema<Post>({
     type: String,
     required: true
   },
-  user: {
+  author: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true

@@ -2,7 +2,7 @@ import { User } from "./user.interface";
 
 export interface Post {
     id: string;
-    user: User;
+    author: User;
     text: string;
     likesCount: number;
     createdAt: Date;

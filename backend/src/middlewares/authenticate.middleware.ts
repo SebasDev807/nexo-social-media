@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { User } from '../interfaces'
-import { BadRequestException, NotFoundException, UnauthorizedException } from '../exceptions'
+import { NotFoundException, UnauthorizedException } from '../exceptions'
 import { envs } from '../config'
 import { getUserFromDb } from '../helpers'
 
@@ -35,11 +35,7 @@ export const authenticate = async (req: Request, _: Response, next: NextFunction
 
         if (typeof result === 'object' && result.uid) {
 
-
             const user = await getUserFromDb(result.uid);
-
-            console.log({ user });
-
 
             if (!user) {
                 throw new NotFoundException("User does not exists")
