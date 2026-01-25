@@ -4,14 +4,21 @@ import { Like } from "../interfaces";
 const LikeSchema = new Schema<Like>({
     post: {
         type: Schema.Types.ObjectId,
+        ref: 'Post'
     },
     reply: {
         type: Schema.Types.ObjectId,
+        ref: 'Reply'
+    },
+    comment: {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment'
     },
     user: {
         type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
-    }
+    },
 }, {
     timestamps: true
 });

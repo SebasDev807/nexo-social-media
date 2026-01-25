@@ -11,9 +11,9 @@ const ReplySchema = new Schema<Reply>({
         ref: 'User',
         required: true
     },
-    post: {
+    comment: {
         type: Schema.Types.ObjectId,
-        ref:'Post'
+        ref:'Comment'
     }
 }, {
     timestamps: true

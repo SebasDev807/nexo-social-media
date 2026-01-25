@@ -14,10 +14,17 @@ const PostSchema = new Schema<Post>({
   likesCount: {
     type: Number,
     default: 0
-  }
+  },
+  comments: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Comment'
+  }]
+
 }, {
-  timestamps: true
+  timestamps: true,
+  versionKey: false
 });
+
 
 PostSchema.methods.toJSON = function () {
   const { __v, ...rest } = this.toObject();

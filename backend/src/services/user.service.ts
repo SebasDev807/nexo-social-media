@@ -1,7 +1,7 @@
 import { hashSync } from "bcryptjs";
 import { User } from "../interfaces";
 import { UserModel } from "../models";
-import { NotFoundException } from "../exceptions";
+import { ConflictException } from "../exceptions";
 import { generateUsername } from "../helpers";
 
 
@@ -12,7 +12,7 @@ export const createUserService = async (user: User) => {
     const userExists = await UserModel.findOne({ email });
 
     if (userExists) {
-        throw new NotFoundException(`User with email ${email} already exists`)
+        throw new ConflictException(`User already exists`)
     }
 
     const newUser = await UserModel.create({

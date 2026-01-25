@@ -1,6 +1,6 @@
 import { NotFoundException } from "../exceptions";
 import { Post, User } from "../interfaces";
-import { LikeModel, PostModel } from "../models";
+import { CommentModel, LikeModel, PostModel } from "../models";
 
 export const createPostService = async (text: Post['text'], user: User) => {
 
@@ -16,14 +16,21 @@ export const createPostService = async (text: Post['text'], user: User) => {
 
 };
 
-
 export const getAllPostPaginatedService = async () => {
-    
-    const posts = await PostModel.find({})
-        .limit(20);
+    const posts = await PostModel.find()
+        .populate('author', '_id username')
+        .populate({
+            path: 'comments',
+            select: 'text likesCount createdAt updatedAt',
+            populate: {
+                path: 'author',
+                select: '_id username'
+            }
+        })
+        .lean({ versionKey: false });
 
-    return posts
-}
+    return posts;
+};
 
 
 export const findPostById = async (idPost: Post['id']) => {
@@ -34,9 +41,8 @@ export const findPostById = async (idPost: Post['id']) => {
         throw new NotFoundException("Post not found")
     }
 
-    return post
+    return post;
 }
-
 
 export const likePostService = async (postId: string, user: User) => {
 
@@ -73,3 +79,56 @@ export const likePostService = async (postId: string, user: User) => {
 
     return { liked: true };
 };
+
+export const searchPostByTextService = async (searchTerm: string) => {
+
+    const posts = await PostModel.find({
+        text: { $regex: searchTerm, $options: "i" }
+    })
+        .populate('author', '_id username')
+        .populate({
+            path: 'comments',
+            select: 'text likesCount createdAt updatedAt',
+            populate: {
+                path: 'author',
+                select: '_id username'
+            }
+        })
+        .lean();
+
+    if (posts.length === 0) {
+        throw new NotFoundException("No posts found")
+    }
+
+    return posts;
+};
+
+export const updatePostService = async (text: string, postId: string, user: User) => {
+
+    const updatedPost = await PostModel.findByIdAndUpdate(
+        postId,
+        { text },
+        { new: true }
+    );
+
+    return updatedPost;
+}
+
+export const deletePostService = async (postId: string) => {
+
+    //Eliminar el post
+    const post = await PostModel.findByIdAndDelete(postId);
+
+    if (!post) {
+        throw new NotFoundException("Post not found");
+    }
+
+    await Promise.all([
+        //Borrar todos los comentarios asociados
+        CommentModel.deleteMany({ post }),
+        //Borrar Likes Asociados
+        LikeModel.deleteMany({ post })
+    ])
+
+    return post;
+}

@@ -1,8 +1,9 @@
-import { authRouter, userRouter, postRouter } from "./routes";
+import { authRouter, userRouter, postRouter, commentRouter } from "./routes";
 import { dbConnect, envs, corsConfig } from "./config";
 import { errorHandler } from "./middlewares";
 import express, { Application } from 'express';
 import cors from 'cors';
+
 
 class Server {
 
@@ -30,7 +31,8 @@ class Server {
     private routes() {
         this.app.use("/api/v1/user", userRouter);
         this.app.use("/api/v1/auth", authRouter);
-        this.app.use("/api/v1/post", postRouter)
+        this.app.use("/api/v1/post", postRouter);
+        this.app.use("/api/v1/comment", commentRouter);
     }
 
     private errorHandlers() {

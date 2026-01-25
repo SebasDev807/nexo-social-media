@@ -1,6 +1,6 @@
 import { HttpException } from "./base.exception";
 
-export class ConflictError extends HttpException {
+export class ConflictException extends HttpException {
     
     public statusCode = 409
 

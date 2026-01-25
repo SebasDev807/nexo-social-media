@@ -1,3 +1,4 @@
+export * from './comment.interface';
 export * from './follow.interface';
 export * from './jwt-payload.interface';
 export * from './like.interface';
