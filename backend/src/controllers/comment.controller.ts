@@ -5,7 +5,7 @@ export const commentPostController = async (req: Request, res: Response) => {
     const { idPost } = req.params;
     const { text } = req.body;
 
-    const comment = await commentPostService(text, idPost as string, req.user);
+    const comment = await commentPostService(text, idPost as string, req.user.id);
 
     return res.status(201).json({
         comment

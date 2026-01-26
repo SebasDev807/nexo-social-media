@@ -1,12 +1,12 @@
-import { Comment } from "./comment.interface";
-import { User } from "./user.interface";
+import { Types } from "mongoose";
+
 
 export interface Post {
     id: string;
-    author: User;
+    author: Types.ObjectId;
     text: string;
     likesCount: number;
     createdAt: Date;
     updatedAt: string;
-    comments: Comment[];
+    comments: Types.ObjectId[];
 }

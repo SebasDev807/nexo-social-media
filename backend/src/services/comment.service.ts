@@ -1,12 +1,14 @@
-import { Post, User } from "../interfaces";
+import { User } from "../interfaces";
 import { CommentModel, PostModel } from "../models";
-import { findPostById } from "./post.service";
 
-export const commentPostService = async (text: string, postId: string, author: User) => {
 
-    const post = await findPostById(postId);
+export const commentPostService = async (text: string, postId: string, author: string) => {
 
-    const comment = await CommentModel.create({ text, post, author })
+    const comment = await CommentModel.create({
+        text,
+        post:postId,
+        author
+    })
 
     await PostModel.findByIdAndUpdate(postId, {
         $push: { comments: comment }

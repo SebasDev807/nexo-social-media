@@ -1,10 +1,10 @@
-import { Comment } from "./comment.interface";
-import { User } from "./user.interface";
+import { Types } from "mongoose";
+
 
 export interface Reply {
     id: string;
-    comment: Comment;
-    user: User;
+    comment: Types.ObjectId;
+    user: Types.ObjectId;
     text: string;
     likesCount: number;
 }

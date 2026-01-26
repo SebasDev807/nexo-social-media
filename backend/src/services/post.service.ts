@@ -2,7 +2,7 @@ import { NotFoundException } from "../exceptions";
 import { Post, User } from "../interfaces";
 import { CommentModel, LikeModel, PostModel } from "../models";
 
-export const createPostService = async (text: Post['text'], user: User) => {
+export const createPostService = async (text: Post['text'], user: User['id']) => {
 
     const post = await PostModel.create({
         text,
@@ -44,12 +44,12 @@ export const findPostById = async (idPost: Post['id']) => {
     return post;
 }
 
-export const likePostService = async (postId: string, user: User) => {
+export const likePostService = async (postId: string, user: User['id']) => {
 
     const postDb = await findPostById(postId);
 
     const existingLike = await LikeModel.findOne({
-        post: postDb,
+        post: postId,
         user
     });
 
@@ -67,7 +67,7 @@ export const likePostService = async (postId: string, user: User) => {
 
     // Si no existe se agrega un Like
     await LikeModel.create({
-        post: postDb,
+        post: postId,
         user: user
     });
 
@@ -103,7 +103,7 @@ export const searchPostByTextService = async (searchTerm: string) => {
     return posts;
 };
 
-export const updatePostService = async (text: string, postId: string, user: User) => {
+export const updatePostService = async (text: string, postId: string) => {
 
     const updatedPost = await PostModel.findByIdAndUpdate(
         postId,
@@ -125,9 +125,9 @@ export const deletePostService = async (postId: string) => {
 
     await Promise.all([
         //Borrar todos los comentarios asociados
-        CommentModel.deleteMany({ post }),
+        CommentModel.deleteMany({ post: postId }),
         //Borrar Likes Asociados
-        LikeModel.deleteMany({ post })
+        LikeModel.deleteMany({ post: postId })
     ])
 
     return post;
