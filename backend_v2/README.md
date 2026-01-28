@@ -105,7 +105,13 @@ pnpx prisma generate
 pnpx prisma migrate dev
 ```
 
-8. Inicia el servidor:
+8. Accede al gestor visual de Prisma Studio:
+
+```bash
+pnpm db:studio
+```
+
+9. Inicia el servidor:
 
 ```bash
 pnpm start:dev
