@@ -1,0 +1,1 @@
+export type SearchTerm = { id ?: string; email ?: string, username ?: string };

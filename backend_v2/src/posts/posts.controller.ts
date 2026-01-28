@@ -5,6 +5,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Auth } from '../auth';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { type User } from '../interfaces/user.interface'
+import { CheckOwner } from 'src/auth/decorators/check-owner.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -20,6 +21,7 @@ export class PostsController {
     return this.postsService.create(createPostDto, user);
   }
 
+
   @Get()
   findAll() {
     return this.postsService.findAll();
@@ -34,9 +36,11 @@ export class PostsController {
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(+id, updatePostDto);
   }
-
+  
+  //Proteger esta ruta para que solo el dueño pueda eliminar el post
+  @CheckOwner()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  deletePost(@Param('id') id: string) {
+    return this.postsService.deletePost(id);
   }
 }

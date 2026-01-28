@@ -2,10 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Auth } from '../auth';
+import { IsSelf } from '../auth/decorators/is-self.decorator';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post("register")
   registerUser(@Body() createUserDto: CreateUserDto) {
@@ -21,10 +23,17 @@ export class UsersController {
   findOne(@Param('id') id: string) {
     return this.usersService.findOneById(id);
   }
+  @Auth()
+  @Get(':searchTerm/posts')
+  findOneWithPosts(@Param('searchTerm') searchTerm: string) {
+    return this.usersService.findOneWithPosts(searchTerm);
+  }
 
+
+  @IsSelf()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')

@@ -1,8 +1,9 @@
-import { Injectable, InternalServerErrorException, Logger, LoggerService } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger, LoggerService, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { type User } from '../interfaces/user.interface'
 import { PrismaService } from '../prisma.service';
+import { log } from 'console';
 
 
 @Injectable()
@@ -49,7 +50,19 @@ export class PostsService {
     return `This action updates a #${id} post`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async deletePost(id: string) {
+    try {
+      await this.prisma.post.delete({
+        where: {
+          id: id
+        }
+      });
+
+      return { message: 'Post deleted successfully' };
+
+    } catch (error:any) {
+      this.logger.error('Error deleting post', error.stack);
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
   }
 }

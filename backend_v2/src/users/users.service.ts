@@ -1,13 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import { hashSync } from 'bcryptjs';
+import { SearchTerm } from './interfaces/search-term.interface';
 
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly prisma: PrismaService) { }
+  private readonly logger = new Logger(UsersService.name);
+
+  constructor(
+    private readonly prisma: PrismaService
+  ) { }
 
   async registerUser(createUserDto: CreateUserDto) {
 
@@ -32,9 +37,46 @@ export class UsersService {
 
 
     return newUser;
+  }
 
-
-
+  /**
+   * Busca un usuario por un término flexible e incluye sus publicaciones.
+   *
+   * El término de búsqueda puede coincidir con:
+   * - ID del usuario
+   * - Correo electrónico
+   * - Nombre de usuario
+   *
+   * Este método se utiliza normalmente para vistas de perfil
+   * donde se necesita mostrar la información del usuario junto con sus posts.
+   *
+   * @param searchTerm Valor usado para buscar al usuario (id, email o username)
+   * @returns Usuario con sus posts incluidos, o null si no se encuentra
+   */
+  async findOneWithPosts(searchTerm: string) {
+    return await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: searchTerm },
+          { email: searchTerm },
+          { username: searchTerm }
+        ]
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        slogan: true,
+        posts: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true
+          },
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    });
   }
 
   findAll() {
@@ -45,20 +87,35 @@ export class UsersService {
     return this.findOneByFilter({ id });
   }
 
-  async findOneByFilter(...filters: { id?: string; email?: string, username?: string }[]) {
+  async findOneByFilter(...filters: SearchTerm[]) {
 
     const user = await this.prisma.user.findFirst({
       where: {
         OR: filters
       },
-     
+
     });
 
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    try {
+
+      const { password, ...safeUser } = updateUserDto;
+
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: { ...safeUser },
+        omit: { password: true }
+      });
+  
+      return updatedUser;
+      
+    } catch (error) {
+      this.logger.error('Error updating user', error.stack);
+      throw new ConflictException('Error updating user');
+    }
   }
 
   remove(id: number) {
