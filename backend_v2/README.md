@@ -62,8 +62,8 @@ Antes de iniciar, asegúrate de tener instalado:
 1. Clona el repositorio:
 
 ```bash
-git clone <repo-url>
-cd nexo-backend
+git clone https://github.com/SebasDev807/nexo-social-media.git
+cd backend_v2
 ```
 
 2. Instala Nest CLI:
