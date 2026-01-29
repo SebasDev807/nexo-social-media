@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -6,10 +6,14 @@ import { Auth } from '../auth';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { type User } from '../interfaces/user.interface'
 import { CheckOwner } from 'src/auth/decorators/check-owner.decorator';
+import { PaginationDto } from '../common';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) { }
+
+  constructor(
+    private readonly postsService: PostsService
+  ) { }
 
   @Auth()
   @Post()
@@ -22,19 +26,22 @@ export class PostsController {
   }
 
 
+  @Auth()
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query() paginationDto:PaginationDto) {
+    return this.postsService.findAll(paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(+id);
+  @Auth()
+  @Get(':searchTerm')
+  findOne(@Param('searchTerm') searchTerm: string) {
+    return this.postsService.findByTerm(searchTerm);
   }
 
+  @CheckOwner()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+    return this.postsService.update(id, updatePostDto);
   }
   
   //Proteger esta ruta para que solo el dueño pueda eliminar el post
